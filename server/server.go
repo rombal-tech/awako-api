@@ -1,0 +1,34 @@
+package server
+
+import (
+	"context"
+	"github.com/sirupsen/logrus"
+	"net/http"
+	"time"
+)
+
+type Server struct {
+	httpServer *http.Server
+}
+
+func (s *Server) Run(port string) error {
+	s.httpServer = &http.Server{
+		Addr:           ":" + port,
+		MaxHeaderBytes: 1 << 20, //1 mb
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+	}
+	logrus.Info("server started successfully")
+	return s.httpServer.ListenAndServe()
+}
+
+func (s *Server) Shutdown(ctx context.Context) {
+	logrus.Info("server shutdown process started")
+	if err := s.httpServer.Shutdown(ctx); err != nil {
+		logrus.Error(err.Error())
+	} else {
+		logrus.Info("http listener shutdown successfully")
+	}
+
+	logrus.Info("server shutdown process completed successfully")
+}
