@@ -1,46 +1,21 @@
 package main
 
 import (
-	configs "alvile-api/config"
-	"alvile-api/models"
 	"alvile-api/pkg/handler"
 	"alvile-api/pkg/repository"
+	"alvile-api/pkg/service"
 	"alvile-api/server"
 	"github.com/sirupsen/logrus"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 func main() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
-	var serverInstance server.Server
-	env := models.LoadEnv()
-	config := configs.LoadConfig()
-	database := repository.NewBusinessDatabase(env, config)
-	repos := repository.NewRepository(database)
+	repos := repository.NewRepository()
 	services := service.NewService(repos)
-	handlers := handler.NewHandler(services)
-
-	go runServer(&serverInstance, handlers, config.Server)
-
-	runChannelStopServer()
-
-	serverInstance.Shutdown(context.Background())
-
-}
-func runServer(server *server.Server, handlers *handler.Handler, config *configs.ServerConfig) {
-	ginEngine := handlers.InitRoutes()
-
-	if err := server.Run(config.Port, ginEngine); err != nil {
-		if err.Error() != "http: Server closed" {
-			logrus.Fatalf("error occurred while running http server: %s", err.Error())
-		}
+	handlers := handler.NewService(services)
+	var serverInstance server.Server
+	if err := serverInstance.Run("8080", handlers.InitRoutes()); err != nil {
+		logrus.Fatalf("error ocured while running http server: %s", err.Error())
 	}
-}
 
-func runChannelStopServer() {
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGABRT)
-	<-quit
 }

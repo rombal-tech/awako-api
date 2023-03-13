@@ -1,22 +1,12 @@
 package repository
 
-import (
-	"alvile-api/models"
-	"alvile-api/queries"
-)
-
-type Account interface {
-	IsExistByEmail(email string) (bool, error)
-	IsExistByID(id int64) (bool, error)
-	Registration(input *models.RegistrationAccountInput) (*queries.Account, error)
+type Authorization interface {
 }
 
 type Repository struct {
-	Account
+	Authorization
 }
 
-func NewRepository(db *queries.Queries) *Repository {
-	return &Repository{
-		Account: NewAccountPostgres(db),
-	}
+func NewRepository() *Repository {
+	return &Repository{}
 }

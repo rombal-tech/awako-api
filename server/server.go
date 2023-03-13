@@ -23,13 +23,14 @@ func (s *Server) Run(port string, handler http.Handler) error {
 	return s.httpServer.ListenAndServe()
 }
 
-func (s *Server) Shutdown(ctx context.Context) {
+func (s *Server) Shutdown(ctx context.Context) error {
 	logrus.Info("server shutdown process started")
 	if err := s.httpServer.Shutdown(ctx); err != nil {
 		logrus.Error(err.Error())
 	} else {
 		logrus.Info("http listener shutdown successfully")
 	}
-
 	logrus.Info("server shutdown process completed successfully")
+	return s.httpServer.Shutdown(ctx)
+
 }

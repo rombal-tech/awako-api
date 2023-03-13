@@ -1,0 +1,13 @@
+
+{
+
+  "postgres": {
+    "host": "localhost[2]",
+    "port": "8080",
+    "DBName": "postgres",
+    "SSLMode": "disable"
+  },
+  "server": {
+    "port": 8080
+  }
+}
