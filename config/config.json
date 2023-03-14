@@ -1,13 +1,14 @@
 
 {
-
-  "postgres": {
-    "host": "localhost[2]",
-    "port": "8080",
-    "DBName": "postgres",
-    "SSLMode": "disable"
-  },
-  "server": {
-    "port": 8080
-  }
+    "server": {
+        "port": "8080"
+    },
+    "postgres": {
+        "host": "localhost",
+        "port": "5432",
+        "username": "postgres",
+        "password": "1234",
+        "dbname":  "postgres",
+        "sslmode": "disable"
+    }
 }
