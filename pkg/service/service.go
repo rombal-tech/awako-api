@@ -1,8 +1,12 @@
 package service
 
-import "alvile-api/pkg/repository"
+import (
+	"alvile-api/models"
+	"alvile-api/pkg/repository"
+)
 
 type Authorization interface {
+	CreateUser(user models.Account) (string, error)
 }
 
 type Service struct {
@@ -10,5 +14,7 @@ type Service struct {
 }
 
 func NewService(repos *repository.Repository) *Service {
-	return &Service{}
+	return &Service{
+		Authorization: NewAuthService(repos.Authorization),
+	}
 }
