@@ -5,16 +5,17 @@ import (
 	"alvile-api/pkg/repository"
 )
 
-type Authorization interface {
+type Registration interface {
 	CreateUser(user models.Account) (string, error)
+	CreateSession(session models.Session, email, password string) (string, error)
 }
 
 type Service struct {
-	Authorization
+	Registration
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		Authorization: NewAuthService(repos.Authorization),
+		Registration: NewAuthService(repos.Registration),
 	}
 }
