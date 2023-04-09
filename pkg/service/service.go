@@ -8,6 +8,8 @@ import (
 type Registration interface {
 	CreateUser(user models.Account) (string, error)
 	CreateSession(session models.Session, email, password string) (string, error)
+	CreateScheme(scheme models.Scheme) (int64, error)
+	AuthorizationСheck(hed string) bool
 }
 
 type Service struct {

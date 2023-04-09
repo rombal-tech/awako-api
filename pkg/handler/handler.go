@@ -20,6 +20,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST("/registration", h.registration)
 		auth.POST("/authorization", h.authorization)
 	}
+	schem := router.Group("/schem")
+	{
+		schem.GET("/get", h.getScheme)
+		schem.POST("/post", h.postScheme)
+	}
 
 	return router
 }

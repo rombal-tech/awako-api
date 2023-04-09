@@ -42,3 +42,22 @@ func (r *AuthPostgres) CreateSession(session models.Session) (string, error) {
 
 	return sessionString, nil
 }
+
+func (r *AuthPostgres) CreateSchema(schema models.Scheme) (int64, error) {
+	var id int64
+	query := fmt.Sprintf("INSERT INTO \"public.Scheme\" (name,description,author) values($1,$2,$3) RETURNING id")
+	row := r.db.QueryRow(query, schema.Name, schema.Description, schema.Author)
+	if err := row.Scan(&id); err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+func (r *AuthPostgres) AuthorizationСheck(hed string) bool {
+	var errAuthorization bool
+	query := fmt.Sprintf("SELECT EXISTS(SELECT session_string FROM \"public.Session\"WHERE session_string =$1)")
+	//query := fmt.Sprintf("SELECT session_string FROM \"public.Session\" WHERE session_string =$1 ")
+
+	return query
+}

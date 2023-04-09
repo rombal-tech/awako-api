@@ -38,3 +38,30 @@ func (h *Handler) authorization(c *gin.Context) {
 	})
 
 }
+
+func (h *Handler) postScheme(c *gin.Context) {
+	var inputScheme models.Scheme
+
+	hed := c.GetHeader("Authorization")
+	errAuthorization := h.services.Registration.AuthorizationСheck(hed)
+	if !errAuthorization {
+		newErrorResponse(c, http.StatusUnauthorized, "Unauthorized")
+	}
+
+	if err := c.BindJSON(&inputScheme); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	id, err := h.services.Registration.CreateScheme(inputScheme)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"id": id,
+	})
+
+}
+
+func (h *Handler) getScheme(c *gin.Context) {
+
+}

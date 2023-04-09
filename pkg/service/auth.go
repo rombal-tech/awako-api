@@ -42,6 +42,14 @@ func (s *AuthService) CreateSession(sessionDB models.Session, email, password st
 
 }
 
+func (s *AuthService) CreateScheme(schema models.Scheme) (int64, error) {
+	return s.repo.CreateSchema(schema)
+}
+
+func (s *AuthService) AuthorizationСheck(hed string) bool {
+	return s.repo.AuthorizationСheck(hed)
+}
+
 func generatePassword(inputPassword string) string {
 	var err error
 	rand.Seed(time.Now().UnixNano())
