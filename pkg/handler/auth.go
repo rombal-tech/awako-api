@@ -43,16 +43,17 @@ func (h *Handler) postScheme(c *gin.Context) {
 	var inputScheme models.Scheme
 
 	hed := c.GetHeader("Authorization")
-	errAuthorization := h.services.Registration.AuthorizationСheck(hed)
-	if !errAuthorization {
+	email, errAuthorization := h.services.Registration.AuthorizationСheck(hed)
+	if errAuthorization != nil {
 		newErrorResponse(c, http.StatusUnauthorized, "Unauthorized")
+		return
 	}
 
 	if err := c.BindJSON(&inputScheme); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	id, err := h.services.Registration.CreateScheme(inputScheme)
+	id, err := h.services.Registration.CreateScheme(inputScheme, email)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}

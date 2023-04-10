@@ -42,11 +42,11 @@ func (s *AuthService) CreateSession(sessionDB models.Session, email, password st
 
 }
 
-func (s *AuthService) CreateScheme(schema models.Scheme) (int64, error) {
-	return s.repo.CreateSchema(schema)
+func (s *AuthService) CreateScheme(schema models.Scheme, email string) (int64, error) {
+	return s.repo.CreateSchema(schema, email)
 }
 
-func (s *AuthService) AuthorizationСheck(hed string) bool {
+func (s *AuthService) AuthorizationСheck(hed string) (string, error) {
 	return s.repo.AuthorizationСheck(hed)
 }
 
