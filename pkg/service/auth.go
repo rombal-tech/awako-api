@@ -20,37 +20,41 @@ func NewAuthService(repo repository.Registration) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) CreateUser(user models.Account) (string, error) {
+func (s *AuthService) CreateUser(user *models.AccountInput) (*models.AccountOutput, error) {
 	if user.Password == "" {
-		user.Password = generatePassword(user.Password)
-		user.Password = generatePasswordHash(user.Password)
+		user.Password = GeneratePassword(user.Password)
+		user.Password = GeneratePasswordHash(user.Password)
 		return s.repo.CreateUser(user)
 	} else {
-		user.Password = generatePasswordHash(user.Password)
+		user.Password = GeneratePasswordHash(user.Password)
 		return s.repo.CreateUser(user)
 	}
 }
 
-func (s *AuthService) CreateSession(sessionDB models.Session, email, password string) (string, error) {
+func (s *AuthService) CreateSession(sessionDB *models.Session, email, password string) (*models.SessionOutput, error) {
 	var err error
-	sessionDB.Email, err = s.repo.GetUser(email, generatePasswordHash(password))
+	sessionDB.Email, err = s.repo.GetUser(email, GeneratePasswordHash(password))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	sessionDB.SessionString = generateSession(sessionDB.SessionString)
+	sessionDB.SessionString = GenerateSession(sessionDB.SessionString)
 	return s.repo.CreateSession(sessionDB)
 
 }
 
 func (s *AuthService) CreateScheme(schema models.Scheme, email string) (int64, error) {
-	return s.repo.CreateSchema(schema, email)
+	return s.repo.CreateScheme(schema, email)
 }
 
-func (s *AuthService) AuthorizationСheck(hed string) (string, error) {
-	return s.repo.AuthorizationСheck(hed)
+func (s *AuthService) CheckAuthorization(hed string) (string, error) {
+	return s.repo.CheckAuthorization(hed)
 }
 
-func generatePassword(inputPassword string) string {
+func (s *AuthService) GetScheme(email string) (string, error) {
+	return s.repo.GetScheme(email)
+}
+
+func GeneratePassword(inputPassword string) string {
 	var err error
 	rand.Seed(time.Now().UnixNano())
 	inputPassword, err = password.Generate(10, 5, 0, false, true)
@@ -60,7 +64,7 @@ func generatePassword(inputPassword string) string {
 	return inputPassword
 }
 
-func generateSession(inputString string) string {
+func GenerateSession(inputString string) string {
 	var err error
 	inputString, err = password.Generate(60, 5, 0, false, true)
 	if err != nil {
@@ -69,7 +73,7 @@ func generateSession(inputString string) string {
 	return inputString
 }
 
-func generatePasswordHash(password string) string {
+func GeneratePasswordHash(password string) string {
 	hash := sha1.New()
 	hash.Write([]byte(password))
 	return fmt.Sprintf("%x", hash.Sum([]byte(os.Getenv("SALT"))))

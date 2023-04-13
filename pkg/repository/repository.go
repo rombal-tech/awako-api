@@ -6,11 +6,12 @@ import (
 )
 
 type Registration interface {
-	CreateUser(user models.Account) (string, error)
+	CreateUser(user *models.AccountInput) (*models.AccountOutput, error)
 	GetUser(email, password string) (string, error)
-	CreateSession(session models.Session) (string, error)
-	CreateSchema(schema models.Scheme, email string) (int64, error)
-	AuthorizationСheck(hed string) (string, error)
+	CreateSession(session *models.Session) (*models.SessionOutput, error)
+	CreateScheme(schema models.Scheme, email string) (int64, error)
+	CheckAuthorization(hed string) (string, error)
+	GetScheme(email string) (string, error)
 }
 
 type Repository struct {

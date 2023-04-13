@@ -6,10 +6,11 @@ import (
 )
 
 type Registration interface {
-	CreateUser(user models.Account) (string, error)
-	CreateSession(session models.Session, email, password string) (string, error)
+	CreateUser(user *models.AccountInput) (*models.AccountOutput, error)
+	CreateSession(session *models.Session, email, password string) (*models.SessionOutput, error)
 	CreateScheme(scheme models.Scheme, email string) (int64, error)
-	AuthorizationСheck(hed string) (string, error)
+	CheckAuthorization(hed string) (string, error)
+	GetScheme(email string) (string, error)
 }
 
 type Service struct {

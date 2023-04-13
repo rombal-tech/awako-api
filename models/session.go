@@ -5,3 +5,6 @@ type Session struct {
 	Email         string `json:"email" binding:"required"`
 	SessionString string `json:"session_string" binding:"required"`
 }
+type SessionOutput struct {
+	SessionString string `json:"session_string"`
+}

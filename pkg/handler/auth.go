@@ -7,45 +7,73 @@ import (
 )
 
 func (h *Handler) registration(c *gin.Context) {
-	var input models.Account
+	var input models.AccountInput
 	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		h.sendBadRequest(c, err.Error())
 		return
 	}
-	email, err := h.services.Registration.CreateUser(input)
+	output, err := h.services.Registration.CreateUser(&input)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		h.sendInternalServerError(c)
+		return
 	}
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"email": email,
-	})
+
+	if err != nil {
+		h.sendInternalServerError(c)
+		return
+	}
+	h.sendCreatedWithBody(c, output)
 
 }
 
 func (h *Handler) authorization(c *gin.Context) {
-	var inputAccount models.Account
+	var inputAccount models.AccountInput
 	var session models.Session
 	if err := c.BindJSON(&inputAccount); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		h.sendBadRequest(c, err.Error())
 		return
 	}
-	sessionString, err := h.services.Registration.CreateSession(session, inputAccount.Email, inputAccount.Password)
+	output, err := h.services.Registration.CreateSession(&session, inputAccount.Email, inputAccount.Password)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		h.sendInternalServerError(c)
+		return
 	}
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"session_string": sessionString,
+	h.sendCreatedWithBody(c, output)
+
+}
+
+func (h *Handler) createScheme(c *gin.Context) {
+	var inputScheme models.Scheme
+
+	header := c.GetHeader("Authorization")
+	email, errAuthorization := h.services.Registration.CheckAuthorization(header)
+	if errAuthorization != nil {
+		h.sendUnauthorized(c)
+		return
+	}
+
+	if err := c.BindJSON(&inputScheme); err != nil {
+		h.sendBadRequest(c, err.Error())
+		return
+	}
+	id, err := h.services.Registration.CreateScheme(inputScheme, email)
+	if err != nil {
+		h.sendInternalServerError(c)
+		return
+	}
+	c.JSON(http.StatusOK, map[string]interface{}{ //точка
+		"id": id,
 	})
 
 }
 
-func (h *Handler) postScheme(c *gin.Context) {
+func (h *Handler) getScheme(c *gin.Context) {
 	var inputScheme models.Scheme
 
 	hed := c.GetHeader("Authorization")
-	email, errAuthorization := h.services.Registration.AuthorizationСheck(hed)
+	email, errAuthorization := h.services.Registration.CheckAuthorization(hed)
 	if errAuthorization != nil {
-		newErrorResponse(c, http.StatusUnauthorized, "Unauthorized")
+		newErrorResponse(c, http.StatusUnauthorized, errAuthorization.Error())
 		return
 	}
 
@@ -53,16 +81,14 @@ func (h *Handler) postScheme(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	id, err := h.services.Registration.CreateScheme(inputScheme, email)
+
+	name, err := h.services.GetScheme(email)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": id,
+		"email": email,
+		"name":  name,
 	})
-
-}
-
-func (h *Handler) getScheme(c *gin.Context) {
-
 }
