@@ -8,15 +8,22 @@ import (
 
 func (h *Handler) registration(c *gin.Context) {
 	var input models.AccountInput
+	var session models.Session
 	if err := c.BindJSON(&input); err != nil {
 		h.sendBadRequest(c, err.Error())
 		return
 	}
-	output, err := h.services.Registration.CreateUser(&input)
+	output, err := h.services.Registration.CreateUser(input)
 	if err != nil {
 		h.sendInternalServerError(c)
 		return
 	}
+	outputSession, err := h.services.Registration.CreateSession(&session, input.Email, input.Password)
+	if err != nil {
+		h.sendInternalServerError(c)
+		return
+	}
+	output.SessionString = outputSession.SessionString
 
 	if err != nil {
 		h.sendInternalServerError(c)

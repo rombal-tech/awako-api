@@ -20,7 +20,7 @@ func NewAuthService(repo repository.Registration) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) CreateUser(user *models.AccountInput) (*models.AccountOutput, error) {
+func (s *AuthService) CreateUser(user models.AccountInput) (*models.AccountRegistrationOutput, error) {
 	if user.Password == "" {
 		user.Password = GeneratePassword(user.Password)
 		user.Password = GeneratePasswordHash(user.Password)

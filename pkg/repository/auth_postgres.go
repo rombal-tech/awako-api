@@ -14,8 +14,8 @@ func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 	return &AuthPostgres{db: db}
 }
 
-func (r *AuthPostgres) CreateUser(user *models.AccountInput) (*models.AccountOutput, error) {
-	var output models.AccountOutput
+func (r *AuthPostgres) CreateUser(user models.AccountInput) (*models.AccountRegistrationOutput, error) {
+	var output models.AccountRegistrationOutput
 	query := fmt.Sprintf("INSERT INTO \"public.Account\" (email,password,deleted) values($1,$2,false)RETURNING email")
 	row := r.db.QueryRow(query, user.Email, user.Password)
 	if err := row.Scan(&output.Email); err != nil {

@@ -6,7 +6,7 @@ import (
 )
 
 type Registration interface {
-	CreateUser(user *models.AccountInput) (*models.AccountOutput, error)
+	CreateUser(user models.AccountInput) (*models.AccountRegistrationOutput, error)
 	CreateSession(session *models.Session, email, password string) (*models.SessionOutput, error)
 	CreateScheme(scheme models.Scheme, email string) (int64, error)
 	CheckAuthorization(hed string) (string, error)
