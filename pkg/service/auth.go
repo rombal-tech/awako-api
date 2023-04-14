@@ -42,7 +42,7 @@ func (s *AuthService) CreateSession(sessionDB *models.Session, email, password s
 
 }
 
-func (s *AuthService) CreateScheme(schema models.Scheme, email string) (int64, error) {
+func (s *AuthService) CreateScheme(schema models.Scheme, email string) (*models.SchemeOutput, error) {
 	return s.repo.CreateScheme(schema, email)
 }
 
@@ -50,7 +50,7 @@ func (s *AuthService) CheckAuthorization(hed string) (string, error) {
 	return s.repo.CheckAuthorization(hed)
 }
 
-func (s *AuthService) GetScheme(email string) (string, error) {
+func (s *AuthService) GetScheme(email string) ([]models.SchemeOutput, error) {
 	return s.repo.GetScheme(email)
 }
 

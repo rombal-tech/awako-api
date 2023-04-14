@@ -43,15 +43,15 @@ func (r *AuthPostgres) CreateSession(session *models.Session) (*models.SessionOu
 	return &sessionString, nil
 }
 
-func (r *AuthPostgres) CreateScheme(schema models.Scheme, email string) (int64, error) {
-	var id int64
-	query := fmt.Sprintf("INSERT INTO \"public.Scheme\" (name,description,author) values($1,$2,$3) RETURNING id")
+func (r *AuthPostgres) CreateScheme(schema models.Scheme, email string) (*models.SchemeOutput, error) {
+	var scheme models.SchemeOutput
+	query := fmt.Sprintf("INSERT INTO \"public.Scheme\" (name,description,author,creation_date) values($1,$2,$3,CURRENT_TIMESTAMP) RETURNING id")
 	row := r.db.QueryRow(query, schema.Name, schema.Description, email)
-	if err := row.Scan(&id); err != nil {
-		return 0, err
+	if err := row.Scan(&scheme.Id); err != nil {
+		return &scheme, err
 	}
 
-	return id, nil
+	return &scheme, nil
 }
 
 func (r *AuthPostgres) CheckAuthorization(hed string) (string, error) {
@@ -61,9 +61,9 @@ func (r *AuthPostgres) CheckAuthorization(hed string) (string, error) {
 	return email, err
 }
 
-func (r *AuthPostgres) GetScheme(email string) (string, error) {
-	var name string
-	query := fmt.Sprintf("SELECT name FROM \"public.Scheme\" WHERE name =$1 ")
-	err := r.db.Get(&name, query, email)
-	return name, err
+func (r *AuthPostgres) GetScheme(email string) ([]models.SchemeOutput, error) {
+	var output []models.SchemeOutput
+	query := fmt.Sprintf("SELECT id,name,description,author,creation_date FROM \"public.Scheme\" WHERE author =$1 ")
+	err := r.db.Select(&output, query, email)
+	return output, err
 }

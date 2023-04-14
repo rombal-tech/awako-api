@@ -52,6 +52,11 @@ func (h *Handler) authorization(c *gin.Context) {
 func (h *Handler) createScheme(c *gin.Context) {
 	var inputScheme models.Scheme
 
+	if err := c.BindJSON(&inputScheme); err != nil {
+		h.sendBadRequest(c, err.Error())
+		return
+	}
+
 	header := c.GetHeader("Authorization")
 	email, errAuthorization := h.services.Registration.CheckAuthorization(header)
 	if errAuthorization != nil {
@@ -59,23 +64,16 @@ func (h *Handler) createScheme(c *gin.Context) {
 		return
 	}
 
-	if err := c.BindJSON(&inputScheme); err != nil {
-		h.sendBadRequest(c, err.Error())
-		return
-	}
-	id, err := h.services.Registration.CreateScheme(inputScheme, email)
+	output, err := h.services.Registration.CreateScheme(inputScheme, email)
 	if err != nil {
 		h.sendInternalServerError(c)
 		return
 	}
-	c.JSON(http.StatusOK, map[string]interface{}{ //точка
-		"id": id,
-	})
+	h.sendCreatedWithBody(c, output)
 
 }
 
 func (h *Handler) getScheme(c *gin.Context) {
-	var inputScheme models.Scheme
 
 	hed := c.GetHeader("Authorization")
 	email, errAuthorization := h.services.Registration.CheckAuthorization(hed)
@@ -84,18 +82,11 @@ func (h *Handler) getScheme(c *gin.Context) {
 		return
 	}
 
-	if err := c.BindJSON(&inputScheme); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	name, err := h.services.GetScheme(email)
+	output, err := h.services.Registration.GetScheme(email)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		h.sendBadRequest(c, err.Error())
+		h.sendInternalServerError(c)
 		return
 	}
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"email": email,
-		"name":  name,
-	})
+	h.sendOKWithBody(c, output)
 }
