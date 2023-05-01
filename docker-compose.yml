@@ -1,0 +1,20 @@
+version: '3.1'
+
+services:
+
+  db:
+    image: ameag/doc_postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: db_constract
+      POSTGRES_USER: postgres
+    volumes:
+      - .:/queries/schema.sql
+    ports:
+        - "5432:5432"
+
+  app:
+     image: ameag/alvile-api-app
+     ports:
+         - "8080:8080"

@@ -1,0 +1,8 @@
+FROM postgres
+
+ENV POSTGRES_PASSWORD: 1234
+ENV POSTGRES_DB: db_constract
+ENV POSTGRES_USER: postgres
+
+COPY ././queries/schema.sql ./docker-entrypoint-initdb.d/_schema.sql
+EXPOSE 5432
