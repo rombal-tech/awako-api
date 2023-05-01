@@ -22,6 +22,9 @@ COPY --from=build ./app/main .
 COPY --from=build ./app/wait-for-it.sh ./wait-for-it.sh
 COPY --from=build ./app/configs/config.dev.json ./configs/config.json
 
+ENV DB_PASSWORD=1234
+ENV SALT="45cjhFJk230405HjqqM"
+
 CMD ["./wait-for-it.sh", "wakadoo_postgres:5432", "-t", "6", "--", "/app/main"]
 
 EXPOSE 8080
