@@ -5,8 +5,8 @@ import (
 	"alvile-api/pkg/repository"
 	"crypto/sha1"
 	"fmt"
+	"github.com/execaus/exloggo"
 	"github.com/sethvargo/go-password/password"
-	"github.com/sirupsen/logrus"
 	"math/rand"
 	"os"
 	"time"
@@ -59,7 +59,7 @@ func GeneratePassword(inputPassword string) string {
 	rand.Seed(time.Now().UnixNano())
 	inputPassword, err = password.Generate(10, 5, 0, false, true)
 	if err != nil {
-		logrus.Fatal(err)
+		exloggo.Fatal(err.Error())
 	}
 	return inputPassword
 }
@@ -68,7 +68,7 @@ func GenerateSession(inputString string) string {
 	var err error
 	inputString, err = password.Generate(60, 5, 0, false, true)
 	if err != nil {
-		logrus.Fatal(err)
+		exloggo.Fatal(err.Error())
 	}
 	return inputString
 }

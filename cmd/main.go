@@ -5,20 +5,27 @@ import (
 	"alvile-api/pkg/repository"
 	"alvile-api/pkg/service"
 	"alvile-api/server"
+	"github.com/execaus/exloggo"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-	"github.com/sirupsen/logrus"
+	"log"
+
 	"github.com/spf13/viper"
 	"os"
 )
 
 func main() {
-	logrus.SetFormatter(&logrus.JSONFormatter{})
+	if err := exloggo.SetParameters(&exloggo.Parameters{
+		Directory: "logs",
+	}); err != nil {
+		log.Fatal(err.Error())
+	}
+
 	if err := initConfig(); err != nil {
-		logrus.Fatalf("error initializing configs: %s", err.Error())
+		exloggo.Fatalf("error initializing configs: %s", err.Error())
 	}
 	if err := godotenv.Load(); err != nil {
-		logrus.Warningf("error loading env variables: %s, use os env", err.Error())
+		exloggo.Warningf("error loading env variables: %s, use os env", err.Error())
 	}
 	db, err := repository.NewPostgresDB(repository.Config{
 		Host:     viper.GetString("postgres.host"),
@@ -29,19 +36,19 @@ func main() {
 		SSLMode:  viper.GetString("postgres.sslmode"),
 	})
 	if err != nil {
-		logrus.Fatalf("failed to initialize db: %s", err.Error())
+		exloggo.Fatalf("failed to initialize db: %s", err.Error())
 	}
 	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
 	handlers := handler.NewService(services)
 	var serverInstance server.Server
 	if err := serverInstance.Run(viper.GetString("server.port"), handlers.InitRoutes()); err != nil {
-		logrus.Fatalf("error ocured while running http server: %s", err.Error())
+		exloggo.Fatalf("error ocured while running http server: %s", err.Error())
 	}
 }
 
 func initConfig() error {
 	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
+	viper.SetConfigName("config.local")
 	return viper.ReadInConfig()
 }
