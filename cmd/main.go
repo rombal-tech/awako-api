@@ -22,7 +22,7 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		exloggo.Warningf("error loading env variables: %s, use os env", err.Error())
 	}
-
+	//Todo ошибка в NewPostgresDB при чтении конфига
 	db, err := repository.NewPostgresDB(repository.Config{
 		Host:     viper.GetString("postgres.host"),
 		Port:     viper.GetString("postgres.port"),

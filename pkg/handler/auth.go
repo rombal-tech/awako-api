@@ -3,7 +3,6 @@ package handler
 import (
 	"alvile-api/models"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func (h *Handler) registration(c *gin.Context) {
@@ -65,46 +64,4 @@ func (h *Handler) authorization(c *gin.Context) {
 	}
 
 	h.sendOKWithBody(c, &output)
-}
-
-func (h *Handler) createScheme(c *gin.Context) {
-	var inputScheme models.Scheme
-
-	if err := c.BindJSON(&inputScheme); err != nil {
-		h.sendBadRequest(c, err.Error())
-		return
-	}
-
-	header := c.GetHeader("Authorization")
-	email, errAuthorization := h.services.Registration.CheckAuthorization(header)
-	if errAuthorization != nil {
-		h.sendUnauthorized(c)
-		return
-	}
-
-	output, err := h.services.Registration.CreateScheme(inputScheme, email)
-	if err != nil {
-		h.sendInternalServerError(c)
-		return
-	}
-	h.sendCreatedWithBody(c, output)
-
-}
-
-func (h *Handler) getScheme(c *gin.Context) {
-
-	hed := c.GetHeader("Authorization")
-	email, errAuthorization := h.services.Registration.CheckAuthorization(hed)
-	if errAuthorization != nil {
-		newErrorResponse(c, http.StatusUnauthorized, errAuthorization.Error())
-		return
-	}
-
-	output, err := h.services.Registration.GetScheme(email)
-	if err != nil {
-		h.sendBadRequest(c, err.Error())
-		h.sendInternalServerError(c)
-		return
-	}
-	h.sendOKWithBody(c, output)
 }
