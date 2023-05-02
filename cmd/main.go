@@ -8,18 +8,13 @@ import (
 	"github.com/execaus/exloggo"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-	"log"
-
 	"github.com/spf13/viper"
+	"log"
 	"os"
 )
 
 func main() {
-	if err := exloggo.SetParameters(&exloggo.Parameters{
-		Directory: "logs",
-	}); err != nil {
-		log.Fatal(err.Error())
-	}
+	initLogger()
 
 	if err := initConfig(); err != nil {
 		exloggo.Fatalf("error initializing configs: %s", err.Error())
@@ -27,6 +22,7 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		exloggo.Warningf("error loading env variables: %s, use os env", err.Error())
 	}
+
 	db, err := repository.NewPostgresDB(repository.Config{
 		Host:     viper.GetString("postgres.host"),
 		Port:     viper.GetString("postgres.port"),
@@ -38,12 +34,22 @@ func main() {
 	if err != nil {
 		exloggo.Fatalf("failed to initialize db: %s", err.Error())
 	}
+
 	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
 	handlers := handler.NewService(services)
+
 	var serverInstance server.Server
-	if err := serverInstance.Run(viper.GetString("server.port"), handlers.InitRoutes()); err != nil {
+	if err = serverInstance.Run(viper.GetString("server.port"), handlers.InitRoutes()); err != nil {
 		exloggo.Fatalf("error ocured while running http server: %s", err.Error())
+	}
+}
+
+func initLogger() {
+	if err := exloggo.SetParameters(&exloggo.Parameters{
+		Directory: "logs",
+	}); err != nil {
+		log.Fatal(err.Error())
 	}
 }
 

@@ -15,11 +15,13 @@ func NewService(services *service.Service) *Handler {
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.Default()
+
 	auth := router.Group("/auth")
 	{
 		auth.POST("/registration", h.registration)
 		auth.POST("/authorization", h.authorization)
 	}
+
 	scheme := router.Group("/scheme")
 	{
 		scheme.GET("", h.getScheme)

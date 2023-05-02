@@ -20,26 +20,25 @@ func NewAuthService(repo repository.Registration) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) CreateUser(user models.AccountInput) (*models.AccountRegistrationOutput, error) {
-	if user.Password == "" {
-		user.Password = GeneratePassword(user.Password)
-		user.Password = GeneratePasswordHash(user.Password)
-		return s.repo.CreateUser(user)
+func (s *AuthService) CreateAccount(email string, inputPassword string) (*models.Account, error) {
+	var hash string
+	var accountPassword string
+
+	if inputPassword == "" {
+		accountPassword = GeneratePassword()
 	} else {
-		user.Password = GeneratePasswordHash(user.Password)
-		return s.repo.CreateUser(user)
+		accountPassword = inputPassword
 	}
+
+	hash = GeneratePasswordHash(accountPassword)
+
+	return s.repo.CreateAccount(email, hash)
 }
 
-func (s *AuthService) CreateSession(sessionDB *models.Session, email, password string) (*models.SessionOutput, error) {
-	var err error
-	sessionDB.Email, err = s.repo.GetUser(email, GeneratePasswordHash(password))
-	if err != nil {
-		return nil, err
-	}
-	sessionDB.SessionString = GenerateSession(sessionDB.SessionString)
-	return s.repo.CreateSession(sessionDB)
+func (s *AuthService) CreateSession(email string) (*models.Session, error) {
+	hash := GenerateSession()
 
+	return s.repo.CreateSession(email, hash)
 }
 
 func (s *AuthService) CreateScheme(schema models.Scheme, email string) (*models.SchemeOutput, error) {
@@ -54,19 +53,18 @@ func (s *AuthService) GetScheme(email string) ([]models.SchemeOutput, error) {
 	return s.repo.GetScheme(email)
 }
 
-func GeneratePassword(inputPassword string) string {
+func GeneratePassword() string {
 	var err error
 	rand.Seed(time.Now().UnixNano())
-	inputPassword, err = password.Generate(10, 5, 0, false, true)
+	inputPassword, err := password.Generate(10, 5, 0, false, true)
 	if err != nil {
 		exloggo.Fatal(err.Error())
 	}
 	return inputPassword
 }
 
-func GenerateSession(inputString string) string {
-	var err error
-	inputString, err = password.Generate(60, 5, 0, false, true)
+func GenerateSession() string {
+	inputString, err := password.Generate(60, 5, 0, false, true)
 	if err != nil {
 		exloggo.Fatal(err.Error())
 	}
