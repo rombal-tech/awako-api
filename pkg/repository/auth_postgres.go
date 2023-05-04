@@ -18,7 +18,7 @@ func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 func (r *AuthPostgres) CreateAccount(email string, password string) (*models.Account, error) {
 	var account models.Account
 
-	if err := r.db.Get(`INSERT INTO "Account" (email,password,deleted) VALUES ($1,$2,false) RETURNING *`,
+	if err := r.db.Get(&account, "INSERT INTO \"Account\" (email,password,deleted,confirmed,confirm_code) VALUES ($1,$2,false,true,1234) RETURNING *",
 		email,
 		password); err != nil {
 		exloggo.Error(err.Error())

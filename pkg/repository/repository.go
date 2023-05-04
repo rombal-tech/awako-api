@@ -16,8 +16,8 @@ type Account interface {
 }
 
 type Scheme interface {
-	CreateScheme(schema models.Scheme, email string) (*models.SchemeOutput, error)
-	GetScheme(email string) (*[]models.SchemeOutput, error)
+	CreateScheme(schema models.Scheme, email string) (*models.Scheme, error)
+	GetScheme(email string) ([]models.SchemeOutput, error)
 }
 
 type Repository struct {

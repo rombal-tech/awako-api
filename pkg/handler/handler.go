@@ -24,8 +24,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	scheme := router.Group("/scheme")
 	{
-		scheme.GET("", h.getScheme)
-		scheme.POST("", h.createScheme)
+		scheme.GET("", h.CheckAuthorization, h.getScheme)
+		scheme.POST("", h.CheckAuthorization, h.createScheme)
 	}
 
 	return router

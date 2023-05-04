@@ -28,7 +28,7 @@ func (r *AccountPostgres) IsExistByEmail(email string) (bool, error) {
 
 func (r *AccountPostgres) CheckAuthorization(hed string) (string, error) {
 	var email string
-	err := r.db.Get(&email, `SELECT email FROM "Session" WHERE session_string =$1`, hed)
+	err := r.db.Get(&email, `SELECT email FROM "Session" WHERE session =$1`, hed)
 	if err != nil {
 		exloggo.Error(err.Error())
 		return "", errors.ServerError

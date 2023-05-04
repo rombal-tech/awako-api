@@ -3,7 +3,6 @@ package handler
 import (
 	"alvile-api/models"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func (h *Handler) createScheme(c *gin.Context) {
@@ -14,14 +13,9 @@ func (h *Handler) createScheme(c *gin.Context) {
 		return
 	}
 
-	// Todo Нам будет приходить с фронта автор схемы ?
-	// Если да, то принимать почту не нужно
-	header := c.GetHeader("Authorization")
-	email, errAuthorization := h.services.Account.CheckAuthorization(header)
-
-	// Todo Мы перехватываем ошибки еще в repository и там записываем в логи, по сути эти обработчики бесполезны?
-	if errAuthorization != nil {
-		h.sendUnauthorized(c)
+	email, err := h.getAccountContext(c)
+	if err != nil {
+		h.sendInternalServerError(c)
 		return
 	}
 
@@ -37,16 +31,14 @@ func (h *Handler) createScheme(c *gin.Context) {
 
 func (h *Handler) getScheme(c *gin.Context) {
 
-	hed := c.GetHeader("Authorization")
-	email, errAuthorization := h.services.Account.CheckAuthorization(hed)
-	if errAuthorization != nil {
-		newErrorResponse(c, http.StatusUnauthorized, errAuthorization.Error())
+	email, err := h.getAccountContext(c)
+	if err != nil {
+		h.sendInternalServerError(c)
 		return
 	}
 
 	output, err := h.services.Scheme.GetScheme(email)
 	if err != nil {
-		h.sendBadRequest(c, err.Error())
 		h.sendInternalServerError(c)
 		return
 	}

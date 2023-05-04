@@ -13,10 +13,10 @@ func NewSchemeService(repo repository.Scheme) *SchemeService {
 	return &SchemeService{repo: repo}
 }
 
-func (s *SchemeService) CreateScheme(schema models.Scheme, email string) (*models.SchemeOutput, error) {
+func (s *SchemeService) CreateScheme(schema models.Scheme, email string) (*models.Scheme, error) {
 	return s.repo.CreateScheme(schema, email)
 }
 
-func (s *SchemeService) GetScheme(email string) (*[]models.SchemeOutput, error) {
+func (s *SchemeService) GetScheme(email string) ([]models.SchemeOutput, error) {
 	return s.repo.GetScheme(email)
 }
