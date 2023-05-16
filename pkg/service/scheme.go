@@ -17,6 +17,6 @@ func (s *SchemeService) CreateScheme(schema models.Scheme, email string) (*model
 	return s.repo.CreateScheme(schema, email)
 }
 
-func (s *SchemeService) GetScheme(email string) ([]models.SchemeOutput, error) {
-	return s.repo.GetScheme(email)
+func (s *SchemeService) GetScheme(parameters models.InputSchemaParameters, email string) (*models.SchemeOutput, error) {
+	return s.repo.GetScheme(parameters, email)
 }

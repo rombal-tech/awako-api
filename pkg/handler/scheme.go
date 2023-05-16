@@ -30,14 +30,15 @@ func (h *Handler) createScheme(c *gin.Context) {
 }
 
 func (h *Handler) getScheme(c *gin.Context) {
-
+	var inputParameters models.InputSchemaParameters
 	email, err := h.getAccountContext(c)
+
 	if err != nil {
 		h.sendInternalServerError(c)
 		return
 	}
 
-	output, err := h.services.Scheme.GetScheme(email)
+	output, err := h.services.Scheme.GetScheme(inputParameters, email)
 	if err != nil {
 		h.sendInternalServerError(c)
 		return

@@ -27,12 +27,18 @@ func (r *SchemePostgres) CreateScheme(inputSchema models.Scheme, email string) (
 	return &scheme, nil
 }
 
-func (r *SchemePostgres) GetScheme(email string) ([]models.SchemeOutput, error) {
-	var output []models.SchemeOutput
-	err := r.db.Select(output, `SELECT * FROM "Scheme" WHERE author =$1 `, email)
+func (r *SchemePostgres) GetScheme(parameters models.InputSchemaParameters, email string) (*models.SchemeOutput, error) {
+	var output models.SchemeOutput
+	err := r.db.Get(&output.TotalCount, "SELECT COUNT(*) FROM \"Scheme\" WHERE author = $1", email)
 	if err != nil {
 		exloggo.Error(err.Error())
 		return nil, errors.ServerError
 	}
-	return output, err
+	err = r.db.Select(&output.List, "SELECT * FROM \"Scheme\" WHERE name LIKE '%' || $1 || '%' LIMIT $2 OFFSET $3 ", parameters.Search, parameters.Limit, parameters.Page)
+	if err != nil {
+		exloggo.Error(err.Error())
+		return nil, errors.ServerError
+	}
+	// TODO Доделать список вывода схем
+	return &output, err
 }
